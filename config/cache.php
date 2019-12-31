@@ -86,6 +86,7 @@ return [
     |
     */
 
-    'prefix' => 'laravel',
+    'prefix' => 'ttv_admin',
 
+    'ttl' => env('CACHE_TTL', 5)
 ];

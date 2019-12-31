@@ -20,6 +20,7 @@ class Handler extends ExceptionHandler
         \Illuminate\Database\Eloquent\ModelNotFoundException::class,
         \Illuminate\Session\TokenMismatchException::class,
         \Illuminate\Validation\ValidationException::class,
+        ExecuteException::class
     ];
 
     /**
@@ -27,8 +28,9 @@ class Handler extends ExceptionHandler
      *
      * This is a great spot to send exceptions to Sentry, Bugsnag, etc.
      *
-     * @param  \Exception  $exception
+     * @param  Exception $exception
      * @return void
+     * @throws Exception
      */
     public function report(Exception $exception)
     {
@@ -44,6 +46,8 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Exception $exception)
     {
+        if ($request->expectsJson())
+            return restful_exception($exception);
         return parent::render($request, $exception);
     }
 
@@ -57,7 +61,7 @@ class Handler extends ExceptionHandler
     protected function unauthenticated($request, AuthenticationException $exception)
     {
         if ($request->expectsJson()) {
-            return response()->json(['error' => 'Unauthenticated.'], 401);
+            return restful_error(__('messages.unauthorized'), 401);
         }
 
         return redirect()->guest(route('login'));
