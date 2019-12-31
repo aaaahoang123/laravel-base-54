@@ -48,7 +48,7 @@ return [
 
         'jwt' => [
             'driver' => 'jwt',
-            'provider' => 'users'
+            'provider' => 'jwt'
         ]
     ],
 
@@ -75,6 +75,9 @@ return [
             'model' => App\User::class,
         ],
 
+        'jwt' => [
+            'driver' => 'jwt'
+        ]
         // 'users' => [
         //     'driver' => 'database',
         //     'table' => 'users',

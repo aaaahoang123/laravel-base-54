@@ -68,18 +68,7 @@ class JWTGuard implements Guard
 
         $token = $this->getTokenForRequest();
         if (!empty($token)) {
-            $cache_key = CacheKey::AUTH_CACHE_KEY . $token;
-            $user = Cache::get($cache_key);
-            if (!$user) {
-                try {
-                    $u = JWTAuth::toUser($token);
-                    $user = $this->provider->retrieveById($u->id);
-                    $ttl = Carbon::now()->addMinutes(config('cache.ttl'));
-                    Cache::put($cache_key, $user, $ttl);
-                } catch (\Exception $e) {
-                }
-            }
-
+            $user = $this->provider->retrieveByToken(null, $token);
         }
 
         return $this->user = $user;

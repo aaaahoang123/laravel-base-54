@@ -7,6 +7,7 @@
  */
 
 use App\Exceptions\ExecuteException;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Validation\ValidationException;
 
 if (!function_exists("restful_success")) {
@@ -52,14 +53,13 @@ if (!function_exists("restful_exception")) {
     function restful_exception(Exception $exception)
     {
 //        return response()->json($exception->getTrace());
-        if ($exception instanceof ValidationException) {
+        if ($exception instanceof AuthenticationException) {
+            return restful_error(__('messages.unauthorized'), 401);
+        } elseif ($exception instanceof ValidationException) {
             return restful_error($exception->validator->errors()->first());
         } elseif ($exception instanceof ExecuteException) {
             return restful_error($exception->getMessage(), $exception->getCode());
         } else {
-            if (!config('app.debug')){
-                Log::error($exception);
-            }
             return restful_error(
                 config('app.debug') ? $exception->getMessage() : __('messages.failed'),
                 404,

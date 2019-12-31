@@ -151,6 +151,7 @@ abstract class Enum
      * @param  mixed $enumValue
      * @return static
      * @throws InvalidEnumMemberException
+     * @throws \ReflectionException
      */
     public static function getInstance($enumValue)
     {

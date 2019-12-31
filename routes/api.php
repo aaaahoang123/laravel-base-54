@@ -18,5 +18,5 @@ Route::post('login', function () {
 });
 
 Route::get('/user', function (Request $request) {
-    return \App\User::all()->toArray();
+   return $request->user();
 })->middleware('auth:jwt');

@@ -2,12 +2,17 @@
 
 namespace App\Providers;
 
-use App\Auth\JWTGuard;
-use Auth;
+use App\Providers\Traits\AutoBindSingletons;
+use GuzzleHttp\Client;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
+    use AutoBindSingletons {
+        register as autoBindRegister;
+    }
+
+    public $singletons = [];
     /**
      * Bootstrap any application services.
      *
@@ -15,9 +20,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        Auth::extend('jwt', function ($app, $name, $config) {
-            return new JWTGuard(Auth::createUserProvider($config['provider']), $app->make('request'));
-        });
     }
 
     /**
@@ -27,6 +29,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+        $this->autoBindRegister();
+        $this->app->singleton(Client::class, function () {
+            return new Client([
+                'http_errors' => false
+            ]);
+        });
     }
 }
