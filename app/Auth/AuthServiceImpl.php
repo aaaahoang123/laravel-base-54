@@ -9,22 +9,23 @@
 namespace App\Auth;
 
 
+use App\Enums\Type\UserBot;
+use App\Exceptions\ExecuteException;
 use App\Repositories\Contracts\UserRepository;
 use App\User;
 use Exception;
+use GuzzleHttp\Client;
 use JWTAuth;
 
 class AuthServiceImpl implements AuthService
 {
-
-    /**
-     * @var UserRepository
-     */
     private $userRepo;
+    private $http;
 
-    public function __construct(UserRepository $userRepo)
+    public function __construct(UserRepository $userRepo, Client $http)
     {
         $this->userRepo = $userRepo;
+        $this->http = $http;
     }
 
     /**
@@ -42,17 +43,13 @@ class AuthServiceImpl implements AuthService
      */
     public function attempt($credential)
     {
-        $password = isset($credential['password']) ? $credential['password'] : null;
-
-        if (!$password)
-            return null;
-
-        unset($credential['password']);
-
-        $result = $this->userRepo->find($credential);
-        if ($result && $result->count())
-            return $result->first();
-        return null;
+        $forumResult = $this->attemptByForum($credential);
+        if (!$forumResult)
+            throw new ExecuteException(__('Sai tên tài khoản hoặc mật khẩu'));
+        $apiResult = $this->attemptByApi($forumResult);
+        if (!$apiResult || $apiResult->bot != UserBot::ADMIN)
+            throw new ExecuteException(__('Sai tên tài khoản hoặc mật khẩu'));
+        return $apiResult;
     }
 
     /**
@@ -76,5 +73,30 @@ class AuthServiceImpl implements AuthService
     public function generateToken($user)
     {
         return JWTAuth::fromUser($user);
+    }
+
+    public function attemptByForum($credential)
+    {
+        $result = $this->http->post(config('external.forum') . 'check_login_ttv_web', [ 'json' => $credential ]);
+        if ($result) {
+            $response = json_decode($result->getBody());
+            return $response->status
+                ? $response->user
+                : null;
+        }
+        return null;
+    }
+
+    public function attemptByApi($forum_result)
+    {
+        $forum_result->is_web = 1;
+        $result = $this->http->post(config('external.api_v2') . 'login_ttv_app', [ 'json' => $forum_result ]);
+        if ($result) {
+            $response = json_decode($result->getBody());
+            return $response->status
+                ? $this->userRepo->findById($response->user->id)
+                : null;
+        }
+        return null;
     }
 }

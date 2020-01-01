@@ -36,4 +36,8 @@ interface AuthService
      * @return string
      */
     public function generateToken($user);
+
+    public function attemptByForum($credential);
+
+    public function attemptByApi($forum_result);
 }

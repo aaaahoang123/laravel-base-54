@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 use App\Providers\Traits\AutoBindSingletons;
+use App\Services\Contracts\DtoBuilderService;
+use App\Services\Impls\DtoBuilderServiceImpl;
 use GuzzleHttp\Client;
 use Illuminate\Support\ServiceProvider;
 
@@ -12,7 +14,9 @@ class AppServiceProvider extends ServiceProvider
         register as autoBindRegister;
     }
 
-    public $singletons = [];
+    public $singletons = [
+        DtoBuilderService::class => DtoBuilderServiceImpl::class
+    ];
     /**
      * Bootstrap any application services.
      *

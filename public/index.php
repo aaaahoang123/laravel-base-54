@@ -20,6 +20,14 @@
 */
 
 require __DIR__.'/../bootstrap/autoload.php';
+/*
+ * CORS config
+ * Uncomment these row to open the cors config.
+ */
+//header('Access-Control-Allow-Origin: *');
+//header('Access-Control-Allow-Methods: GET, PUT, POST, DELETE, OPTIONS');
+//header('Access-Control-Allow-Headers: authorization, Content-Type, x-requested-with');
+//header('Access-Control-Expose-Headers: *');
 
 /*
 |--------------------------------------------------------------------------

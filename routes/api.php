@@ -1,7 +1,5 @@
 <?php
 
-use Illuminate\Http\Request;
-
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -13,10 +11,5 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::post('login', function () {
-    return response()->json(JWTAuth::fromUser(\App\User::find(1)));
-});
-
-Route::get('/user', function (Request $request) {
-   return $request->user();
-})->middleware('auth:jwt');
+Route::post('login', 'Auth\ApiAuthController@login');
+Route::get('user', 'Auth\ApiAuthController@userData')->middleware('auth:jwt');

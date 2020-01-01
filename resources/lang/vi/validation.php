@@ -117,6 +117,8 @@ return [
     */
 
     'attributes' => [
+        'username' => 'Tên tài khoản',
+        'password' => 'Mật khẩu',
         'situation' => 'Tình trạng',
         'name' => 'Tên',
         'price' => 'Giá',
